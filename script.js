@@ -30,7 +30,7 @@ const sendNotification = async (subject, message) => {
     await transporter.sendMail(mailOptions);
     console.log('Notification sent');
   } catch (error) {
-    console.error('Error sending notification:', error);
+    console.error(`Error sending notification: ${error}`);
   }
 };
 
@@ -50,7 +50,7 @@ async function handleCaptcha(base64Image) {
     });
 
     const captchaId = response.data.request;
-    console.log('CAPTCHA submitted, ID:', captchaId);
+    console.log(`CAPTCHA submitted, ID: ${captchaId}`);
 
     // Wait for CAPTCHA to be solved
     await delay(20000); // Adjust wait time as needed
@@ -64,13 +64,13 @@ async function handleCaptcha(base64Image) {
     });
 
     if (result.data.status === 1) {
-      console.log('CAPTCHA solved:', result.data.request);
+      console.log(`CAPTCHA solved: ${result.data.request}`);
       return result.data.request; // Text solution to the CAPTCHA
     } else {
       throw new Error('Failed to solve CAPTCHA');
     }
   } catch (error) {
-    console.error('Error solving CAPTCHA:', error);
+    console.error(`Error solving CAPTCHA: ${error}`);
     throw error;
   }
 }
@@ -106,7 +106,7 @@ async function loginWith2FA(page) {
 
     console.log('Successfully logged in with 2FA and CAPTCHA handling!');
   } catch (error) {
-    console.error('Login failed:', error);
+    console.error(`Login failed: ${error}`);
     sendNotification('Login Error', `Login failed: ${error.message}`);
     throw error;
   }
@@ -136,9 +136,10 @@ async function checkFreeItems(page) {
       return items;
     });
 
+    console.log(`Free items found: ${JSON.stringify(freeItems)}`);
     return freeItems;
   } catch (error) {
-    console.error('Error checking items:', error);
+    console.error(`Failed to check for free items: ${error}`);
     throw error;
   }
 }
@@ -152,7 +153,7 @@ async function purchaseItem(page, item) {
     console.log(`Purchased: ${item.title}`);
     sendNotification('Purchase Successful', `Successfully purchased ${item.title}`);
   } catch (error) {
-    console.error(`Failed to purchase ${item.title}:`, error);
+    console.error(`Failed to purchase ${item.title}: ${error}`);
     sendNotification('Purchase Error', `Error purchasing ${item.title}: ${error.message}`);
   }
 }
@@ -174,7 +175,7 @@ async function purchaseItem(page, item) {
       const freeItems = await checkFreeItems(page);
 
       if (freeItems.length > 0) {
-        console.log('Free items found:', freeItems);
+        console.log(`Free items found: ${JSON.stringify(freeItems)}`);
         sendNotification('Free Items Found', JSON.stringify(freeItems));
 
         // Purchase the free items (up to 10 units)
@@ -184,7 +185,7 @@ async function purchaseItem(page, item) {
         }
       }
     } catch (error) {
-      console.error('Error during monitoring:', error);
+      console.error(`Error during monitoring: ${error}`);
       sendNotification('Monitoring Error', `Error: ${error.message}`);
     }
 
@@ -194,3 +195,4 @@ async function purchaseItem(page, item) {
 
   await browser.close();
 })();
+
